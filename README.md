@@ -4,7 +4,7 @@ war-multi-security [![build](https://api.travis-ci.org/daggerok/war-multi-securi
 **tags**
 
 - JBoss EAP as java EE application server
-- spring boot war (see daggerok.multi.web.config.Initializer)
+- spring boot war (see daggerok.multi.web.config.Initializer) + mustache template engine
 - spring security and csrf (cross-site request forgery) protection
 - gradle war multi project
 - curl cli
