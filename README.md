@@ -200,7 +200,7 @@ HTTP/1.1 200 OK
 
 ### do not store decoded passwords, never!
 
-if u are good programmer, then u know - save insecure passwords it's absolutely forbidden. users privacy, MF!
+if u are good programmer, when u know - save insecure passwords it's absolutely forbidden. users privacy, MF!
 
 our security config is not exception and of course we are supports this feature too
 
