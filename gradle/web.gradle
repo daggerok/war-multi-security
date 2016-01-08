@@ -1,0 +1,19 @@
+project(":web") {
+    apply plugin: "war"
+
+    war { baseName = "web" }
+
+    configurations {
+        providedRuntime
+    }
+
+    dependencies {
+        compile "org.springframework.boot:spring-boot-starter-mustache",
+                "org.springframework.boot:spring-boot-starter-security",
+                "org.springframework.boot:spring-boot-starter-web",
+                "org.springframework.boot:spring-boot-devtools",
+                project(":data")
+
+        providedRuntime "org.springframework.boot:spring-boot-starter-tomcat"
+    }
+}

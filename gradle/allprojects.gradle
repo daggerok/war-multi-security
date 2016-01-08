@@ -1,0 +1,34 @@
+allprojects {
+    apply plugin: "java"
+    apply plugin: "spring-boot"
+    apply plugin: "application"
+
+    mainClassName = "daggerok.multi.web.WebApplication"
+
+    group = group
+
+    jar {
+        version = version
+    }
+
+    sourceCompatibility = 1.8
+    targetCompatibility = sourceCompatibility
+
+    repositories { jcenter() }
+
+    dependencies {
+        compile "org.springframework.boot:spring-boot-starter"
+
+        testCompile "org.springframework.boot:spring-boot-starter-test"
+    }
+
+    // gradle bootRun -Dserver.context-path=/app
+    bootRun {
+        systemProperties = System.properties
+    }
+
+    // gradle run -Dserver.context-path=/app
+    run {
+        systemProperties = System.properties
+    }
+}
