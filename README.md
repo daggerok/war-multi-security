@@ -4,8 +4,8 @@ war-multi-security [![build](https://api.travis-ci.org/daggerok/war-multi-securi
 **tags**
 
 - JBoss EAP as java EE application server
-- spring boot war (see daggerok.multi.web.config.Initializer) + mustache template engine
-- spring security and csrf (cross-site request forgery) protection
+- spring boot war (see daggerok.multi.web.config.Initializer) + mustache template engine + context-path resources workaround
+- spring security crypt password storage and csrf (cross-site request forgery) protection
 - gradle war multi project
 - curl cli
 
@@ -54,7 +54,6 @@ $ curl -i localhost:8080/app/
 HTTP/1.1 302 Moved Temporarily
 ...
 Location: http://localhost:8080/app/login
-...
 ```
 
 *ok, let's get login page*
@@ -62,7 +61,6 @@ Location: http://localhost:8080/app/login
 ```shell
 $ curl -i localhost:8080/app/login
 HTTP/1.1 200 OK
-...
 ```
 
 ```html
@@ -85,7 +83,6 @@ HTTP/1.1 302 Moved Temporarily
 ...
 Set-Cookie: JSESSIONID=puCKeRDJhw2f8ohyS6bJCeei; Path=/app
 Location: http://localhost:8080/app/
-...
 ```
 
 *thank u.. finally I can go and visit needed page..*
@@ -93,7 +90,6 @@ Location: http://localhost:8080/app/
 ```shell
 $ curl -i localhost:8080/app/ --cookie 'JSESSIONID=puCKeRDJhw2f8ohyS6bJCeei'
 HTTP/1.1 200 OK
-...
 ```
 
 and i've got my page
@@ -153,7 +149,6 @@ X-CSRF-HEADER: X-CSRF-TOKEN
 X-CSRF-PARAM: _csrf
 Set-Cookie: JSESSIONID=+YoBiZIsIzRu8hcOxHHHayHu; Path=/app
 X-CSRF-TOKEN: 7b198da9-f8ff-4259-9d55-b4bfeb517cfc
-...
 ```
 
 and as we can see from html from response body - tokens are same
@@ -194,7 +189,6 @@ $ curl -i -XPOST http://localhost:8080/app/login -d 'username=max&password=max&_
 Set-Cookie: JSESSIONID=RXD3Hho1sLmaUv6qEvf8PrL5; Path=/app
 X-CSRF-TOKEN: 25459ff7-65a9-48e3-a30d-b1903e7d6114
 Location: http://localhost:8080/app/
-...
 ```
 
 **3**
@@ -202,7 +196,61 @@ Location: http://localhost:8080/app/
 ```shell
 $ curl -i http://localhost:8080/app/ --cookie 'JSESSIONID=RXD3Hho1sLmaUv6qEvf8PrL5'
 HTTP/1.1 200 OK
-...
 ```
+
+### do not store decoded passwords, never!
+
+if u are good programmer, then u know - save insecure passwords it's absolutely forbidden. users privacy, MF!
+
+our security config is not exception and of course we are supports this feature too
+
+```java
+public class WebSecurityCfg extends WebSecurityConfigurerAdapter {
+    ...
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth
+            .userDetailsService(userDetailsServiceImpl)
+                .passwordEncoder(new BCryptPasswordEncoder());
+```
+
+we also used BCryptPasswordEncoder in our PasswordGenerator encoder
+
+so, even if u get not hashed password, you must encode it before save in database, for example as we doing in Initializer
+
+```java
+public CommandLineRunner testData(UserRepository userRepository, PasswordGenerator passwordGenerator) {
+    return args -> Arrays.asList("max,dag,bax".split(",")).forEach(name ->
+            userRepository.save(User.of(name, passwordGenerator.encode(name))));
+```
+
+### serving resources with changeable context-path (additional, out of the scope, off topic)
+
+there is a workaround: always use contestPath value in template engine
+
+to fix wrong 404 issue on static content we must provide access to the httpServlerRequest.getContextPath()
+
+*in controller (see: ```web/src/main/java/daggerok/multi/web/ctrl/IndexController.java```)*
+
+```java
+@RequestMapping("/")
+public String index(Model model, HttpServletRequest request) {
+    model.addAttribute("request", request);
+```
+
+*in template (see: ```web/src/main/resources/templates/parts/header.html```)*
+
+```html
+<head>
+...
+{{#request}}
+    {{#contextPath}}
+<link rel="stylesheet" href="{{.}}/bootstrap.css">
+<link rel="stylesheet" href="{{.}}/app.css">
+    {{/contextPath}}
+{{/request}}
+```
+
+NOTE: in case error occurs, we must override BasicErrorController, see: ```daggerok.multi.web.config.error.ErrorControllerImpl```
 
 nice :)

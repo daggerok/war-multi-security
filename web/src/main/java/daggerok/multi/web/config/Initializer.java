@@ -2,6 +2,7 @@ package daggerok.multi.web.config;
 
 import daggerok.multi.data.user.User;
 import daggerok.multi.data.user.UserRepository;
+import daggerok.multi.utils.cryp.PasswordGenerator;
 import daggerok.multi.web.WebApplication;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.web.DispatcherServletAutoConfiguration;
@@ -18,9 +19,9 @@ import java.util.Arrays;
 @Configuration
 public class Initializer extends SpringBootServletInitializer {
     @Bean
-    public CommandLineRunner testData(UserRepository userRepository) {
-        return args -> Arrays.asList("max,dag,bax".split(","))
-                .forEach(name -> userRepository.save(User.of(name, name)));
+    public CommandLineRunner testData(UserRepository userRepository, PasswordGenerator passwordGenerator) {
+        return args -> Arrays.asList("max,dag,bax".split(",")).forEach(name ->
+                userRepository.save(User.of(name, passwordGenerator.encode(name))));
     }
 
     @Bean

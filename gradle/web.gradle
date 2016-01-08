@@ -12,6 +12,7 @@ project(":web") {
                 "org.springframework.boot:spring-boot-starter-security",
                 "org.springframework.boot:spring-boot-starter-web",
                 "org.springframework.boot:spring-boot-devtools",
+                project(":utils"),
                 project(":data")
 
         providedRuntime "org.springframework.boot:spring-boot-starter-tomcat"
