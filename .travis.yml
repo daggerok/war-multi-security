@@ -6,8 +6,6 @@ cache:
     - .gradle
     - gradle
     - $HOME/.gradle
-script:
-  - ./gradlew clean test
 notifications:
   on_failure: change # always|never
   on_success: change
