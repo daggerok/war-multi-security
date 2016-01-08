@@ -9,6 +9,18 @@ war-multi-security [![build](https://api.travis-ci.org/daggerok/war-multi-securi
 - gradle war multi project
 - curl cli
 
+### using spring boot
+
+**checkout sources and run**
+
+```shell
+git clone https://github.com/daggerok/war-multi-security.git
+$ cd $_
+$ ./gradlew run -Dserver.context-path=/app
+```
+
+### using JBoss
+
 **download, unzip configure and run JBoss EAP 6.4**
 
 ```shell
@@ -16,23 +28,14 @@ $ wget ...
 $ tar ...
 $ ~/dev/jboss-eap-6.4/bin/standalone.sh 
 ```
-
-### using spring boot
-
-```shell
-$ ./gradlew -Dserver.context-path=/app clean build run
-```
-
-**checkout, build and deploy project on JBoss**
+**locat JBoss deploy**
 
 ```shell
-$ git clone https://github.com/daggerok/war-multi-security.git
-$ cd $_
 $ ./gradlew clean build
 $ cp web/build/libs/web-1.0.0.war.original ~/dev/jboss-eap-6.4/standalone/deployments/app.war
 ```
 
-application context path will be /app, i.e base url: http://localhost:8080/app/
+NOTE: application context path will be /app
 
 ### in general...
 
@@ -42,7 +45,7 @@ what if customer wanna use his own form or auth service or whatever... but login
 
 here is a simple example with needed requests description
 
-### login with curl
+### login using curl with form and parsing html for getting _csrf 
 
 *I know username, password and I wanna get http://localhost:8080/app/*
 
@@ -121,7 +124,7 @@ HTTP/1.1 302 Moved Temporarily
 Location: http://localhost:8080/app/login?logout
 ```
 
-### custom csrf filter
+### login using curl with custom csrf filter without parsing html
 
 After adding ouw custom csrf filter (see daggerok.multi.web.config.security.CsrfTokenGeneratorFilter)
 and configuring ```daggerok.multi.web.config.security.WebSecurityCfg``` to use it
@@ -139,7 +142,7 @@ public class WebSecurityCfg extends WebSecurityConfigurerAdapter {
             .csrf() // csrf configuration...
 ```
 
-we can parse _csrf token directly from response
+we can get _csrf token directly from response
 
 ```shell
 $ curl -i localhost:8080/login
@@ -169,7 +172,7 @@ and as we can see from html from response body - tokens are same
 
 so now for doing login we don't have to pars html at all! all needed information located in response header
 
-let's do login
+let's do login, it's easy as 1, 2, 3
 
 **1**
 
