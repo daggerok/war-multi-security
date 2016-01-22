@@ -230,25 +230,13 @@ there is a workaround: always use contestPath value in template engine
 
 to fix wrong 404 issue on static content we must provide access to the httpServlerRequest.getContextPath()
 
-*in controller (see: ```web/src/main/java/daggerok/multi/web/ctrl/IndexController.java```)*
-
-```java
-@RequestMapping("/")
-public String index(Model model, HttpServletRequest request) {
-    model.addAttribute("request", request);
-```
-
 *in template (see: ```web/src/main/resources/templates/parts/header.html```)*
 
 ```html
 <head>
 ...
-{{#request}}
-    {{#contextPath}}
-<link rel="stylesheet" href="{{.}}/bootstrap.css">
-<link rel="stylesheet" href="{{.}}/app.css">
-    {{/contextPath}}
-{{/request}}
+<link rel="stylesheet" href="{{springMacroRequestContext.request.contextPath}}/bootstrap.css">
+<link rel="stylesheet" href="{{springMacroRequestContext.request.contextPath}}/app.css">
 ```
 
 *NOTE: in case error occurs, we must override BasicErrorController, (see: ```daggerok.multi.web.config.error.ErrorControllerImpl```)*
